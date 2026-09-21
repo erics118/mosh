@@ -50,7 +50,7 @@ for triple in $ARCH_TRIPLES; do
     prefix="${PREFIX}_${arch}"
     rm -rf "${prefix}"
     mkdir "${prefix}"
-    if ./configure --prefix="${prefix}/local" --build="${triple}${MACOSX_DEPLOYMENT_TARGET}"\
+    if PATH=/opt/homebrew/bin:$PATH ./configure --prefix="${prefix}/local" --build="${triple}${MACOSX_DEPLOYMENT_TARGET}"\
 		   --host="${HOST}" \
 		   CC="cc -arch ${arch}" CPP="cc -arch ${arch} -E" CXX="c++ -arch ${arch}" \
 		   TINFO_LIBS=-lncurses &&
