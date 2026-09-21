@@ -196,35 +196,31 @@ public:
     return ( c <= 0xff && c >= 0xa0 ) || ( c <= 0x7e && c >= 0x20 );
   }
 
-  static void append_to_str( std::string& dest, const wchar_t c )
+  static void append_utf8( std::string& dest, uint32_t c )
   {
-    /* ASCII?  Cheat. */
-    if ( static_cast<uint32_t>( c ) <= 0x7f ) {
+    if ( c <= 0x7f ) {
       dest.push_back( static_cast<char>( c ) );
-      return;
+    } else if ( c <= 0x7ff ) {
+      dest.push_back( static_cast<char>( 0xc0 | ( c >> 6 ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( c & 0x3f ) ) );
+    } else if ( c <= 0xffff ) {
+      dest.push_back( static_cast<char>( 0xe0 | ( c >> 12 ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( ( c >> 6 ) & 0x3f ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( c & 0x3f ) ) );
+    } else {
+      dest.push_back( static_cast<char>( 0xf0 | ( c >> 18 ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( ( c >> 12 ) & 0x3f ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( ( c >> 6 ) & 0x3f ) ) );
+      dest.push_back( static_cast<char>( 0x80 | ( c & 0x3f ) ) );
     }
-    static mbstate_t ps = mbstate_t();
-    char tmp[MB_LEN_MAX];
-    size_t ignore = wcrtomb( NULL, 0, &ps );
-    (void)ignore;
-    size_t len = wcrtomb( tmp, c, &ps );
-    dest.append( tmp, len );
   }
 
-  void append( const wchar_t c )
+  static void append_to_str( std::string& dest, const wchar_t c )
   {
-    /* ASCII?  Cheat. */
-    if ( static_cast<uint32_t>( c ) <= 0x7f ) {
-      contents.push_back( static_cast<char>( c ) );
-      return;
-    }
-    static mbstate_t ps = mbstate_t();
-    char tmp[MB_LEN_MAX];
-    size_t ignore = wcrtomb( NULL, 0, &ps );
-    (void)ignore;
-    size_t len = wcrtomb( tmp, c, &ps );
-    contents.insert( contents.end(), tmp, tmp + len );
+    append_utf8( dest, static_cast<uint32_t>( c ) );
   }
+
+  void append( const wchar_t c ) { append_utf8( contents, static_cast<uint32_t>( c ) ); }
 
   void print_grapheme( std::string& output ) const
   {
