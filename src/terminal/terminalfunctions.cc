@@ -697,6 +697,17 @@ void Dispatcher::OSC_dispatch( const Parser::OSC_End* act __attribute( ( unused 
     Terminal::Framebuffer::title_type clipboard( OSC_string.begin() + 3, OSC_string.end() );
     fb->set_clipboard( clipboard );
     /* handle osc terminal title sequence */
+  } else if ( OSC_string.size() >= 3 && OSC_string[0] == L'1' && OSC_string[1] == L'2' && OSC_string[2] == L';' ) {
+    /* OSC 12: set cursor color */
+    size_t limit = std::min( OSC_string.size(), (size_t)131 );
+    std::string color;
+    for ( size_t i = 3; i < limit; i++ ) {
+      color.append( 1, static_cast<char>( OSC_string[i] ) );
+    }
+    fb->ds.cursor_color = color;
+  } else if ( OSC_string.size() >= 3 && OSC_string[0] == L'1' && OSC_string[1] == L'1' && OSC_string[2] == L'2' ) {
+    /* OSC 112: reset cursor color */
+    fb->ds.cursor_color.clear();
   } else if ( OSC_string.size() >= 1 ) {
     long cmd_num = -1;
     int offset = 0;

@@ -47,6 +47,7 @@ public:
   Hyperlink current_hyperlink;
   bool cursor_visible;
   int cursor_style;
+  std::string cursor_color;
 
   const Framebuffer& last_frame;
 

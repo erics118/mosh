@@ -52,7 +52,7 @@ std::string Display::open() const
 
 std::string Display::close() const
 {
-  return std::string( "\033[?1l\033[0m\033[?25h\033[0 q"
+  return std::string( "\033[?1l\033[0m\033[?25h\033[0 q\033]112\007"
                       "\033[?1003l\033[?1002l\033[?1001l\033[?1000l"
                       "\033[?1015l\033[?1006l\033[?1005l" )
          + std::string( rmcup ? rmcup : "" );
@@ -284,6 +284,16 @@ std::string Display::new_frame( bool initialized, const Framebuffer& last, const
     frame.append( cursor_style_sequence_buf );
   }
 
+  /* has cursor color changed? */
+  if ( ( !initialized ) || ( f.ds.cursor_color != frame.cursor_color ) ) {
+    if ( f.ds.cursor_color.empty() ) {
+      frame.append( "\033]112\007" ); /* reset to default */
+    } else {
+      frame.append_string( "\033]12;" + f.ds.cursor_color + "\007" );
+    }
+    frame.cursor_color = f.ds.cursor_color;
+  }
+
   /* have renditions changed? */
   frame.update_rendition( f.ds.get_renditions(), !initialized );
   /* has hyperlink changed? */
@@ -489,7 +499,8 @@ bool Display::can_use_erase( const FrameState& frame ) const
 
 FrameState::FrameState( const Framebuffer& s_last )
   : str(), cursor_x( 0 ), cursor_y( 0 ), current_rendition( 0 ), current_hyperlink(),
-    cursor_visible( s_last.ds.cursor_visible ), cursor_style( s_last.ds.cursor_style ), last_frame( s_last )
+    cursor_visible( s_last.ds.cursor_visible ), cursor_style( s_last.ds.cursor_style ),
+    cursor_color( s_last.ds.cursor_color ), last_frame( s_last )
 {
   /* Preallocate for better performance.  Make a guess-- doesn't matter for correctness */
   str.reserve( last_frame.ds.get_width() * last_frame.ds.get_height() * 4 );

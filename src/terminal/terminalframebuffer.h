@@ -320,6 +320,7 @@ private:
 
 public:
   int cursor_style;
+  std::string cursor_color; /* OSC 12 spec, empty = terminal default */
 
   bool next_print_will_wrap;
   bool origin_mode;
@@ -403,7 +404,7 @@ public:
     return ( width == x.width ) && ( height == x.height ) && ( cursor_col == x.cursor_col )
            && ( cursor_row == x.cursor_row ) && ( cursor_visible == x.cursor_visible )
            && ( reverse_video == x.reverse_video ) && ( renditions == x.renditions )
-           && ( cursor_style == x.cursor_style )
+           && ( cursor_style == x.cursor_style ) && ( cursor_color == x.cursor_color )
            && ( bracketed_paste == x.bracketed_paste ) && ( mouse_reporting_mode == x.mouse_reporting_mode )
            && ( mouse_focus_event == x.mouse_focus_event ) && ( mouse_alternate_scroll == x.mouse_alternate_scroll )
            && ( mouse_encoding_mode == x.mouse_encoding_mode ) && hyperlink == x.hyperlink;
