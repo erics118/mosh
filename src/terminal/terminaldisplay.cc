@@ -52,7 +52,7 @@ std::string Display::open() const
 
 std::string Display::close() const
 {
-  return std::string( "\033[?1l\033[0m\033[?25h"
+  return std::string( "\033[?1l\033[0m\033[?25h\033[0 q"
                       "\033[?1003l\033[?1002l\033[?1001l\033[?1000l"
                       "\033[?1015l\033[?1006l\033[?1005l" )
          + std::string( rmcup ? rmcup : "" );

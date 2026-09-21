@@ -472,7 +472,7 @@ static void CSI_SGR( Framebuffer* fb, Dispatcher* dispatch )
 
     /* underline color support */
     if (rendition == 58) {
-      unsigned int color = 0;
+      int color = -1; /* -1 = reset to default underline color */
 
       if (exts.size() == 2 && exts[0] == 5) {
         color = exts[1];
