@@ -34,6 +34,7 @@
 
 #include "src/protobufs/hostinput.pb.h"
 #include "src/statesync/completeterminal.h"
+#include "src/util/dos_assert.h"
 #include "src/util/fatal_assert.h"
 
 using namespace std;
@@ -101,7 +102,7 @@ string Complete::init_diff( void ) const
 void Complete::apply_string( const string& diff )
 {
   HostBuffers::HostMessage input;
-  fatal_assert( input.ParseFromString( diff ) );
+  dos_assert( input.ParseFromString( diff ) );
 
   for ( int i = 0; i < input.instruction_size(); i++ ) {
     if ( input.instruction( i ).HasExtension( hostbytes ) ) {

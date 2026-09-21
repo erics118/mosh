@@ -34,6 +34,7 @@
 #define NETWORK_TRANSPORT_IMPL_HPP
 
 #include "src/network/networktransport.h"
+#include "src/util/dos_assert.h"
 
 #include "transportsender-impl.h"
 
@@ -107,6 +108,9 @@ void Transport<MyState, RemoteState>::recv( void )
       //    received.\n", int(inst.old_num) );
       return; /* this is security-sensitive and part of how we enforce idempotency */
     }
+
+    /* reject a peer whose throwaway would free the reference state applied below */
+    dos_assert( inst.throwaway_num() <= inst.old_num() );
 
     /* Do not accept state if our queue is full */
     /* This is better than dropping states from the middle of the

@@ -35,6 +35,7 @@
 #include "compressor.h"
 #include "src/crypto/byteorder.h"
 #include "src/protobufs/transportinstruction.pb.h"
+#include "src/util/dos_assert.h"
 #include "src/util/fatal_assert.h"
 #include "transportfragment.h"
 
@@ -76,7 +77,7 @@ std::string Fragment::tostring( void )
 Fragment::Fragment( const std::string& x )
   : id( -1 ), fragment_num( -1 ), final( false ), initialized( true ), contents()
 {
-  fatal_assert( x.size() >= frag_header_len );
+  dos_assert( x.size() >= frag_header_len );
   contents = std::string( x.begin() + frag_header_len, x.end() );
 
   uint64_t data64;
@@ -138,7 +139,7 @@ Instruction FragmentAssembly::get_assembly( void )
   }
 
   Instruction ret;
-  fatal_assert( ret.ParseFromString( get_compressor().uncompress_str( encoded ) ) );
+  dos_assert( ret.ParseFromString( get_compressor().uncompress_str( encoded ) ) );
 
   fragments.clear();
   fragments_arrived = 0;
