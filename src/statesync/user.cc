@@ -51,8 +51,9 @@ void UserStream::subtract( const UserStream* prefix )
   }
   for ( std::deque<UserEvent>::const_iterator i = prefix->actions.begin(); i != prefix->actions.end(); i++ ) {
     assert( this != prefix );
-    assert( !actions.empty() );
-    assert( *i == actions.front() );
+    /* a malicious peer can send a non-prefix state; drop it instead of aborting */
+    dos_assert( !actions.empty() );
+    dos_assert( *i == actions.front() );
     actions.pop_front();
   }
 }
@@ -62,8 +63,9 @@ std::string UserStream::diff_from( const UserStream& existing ) const
   std::deque<UserEvent>::const_iterator my_it = actions.begin();
 
   for ( std::deque<UserEvent>::const_iterator i = existing.actions.begin(); i != existing.actions.end(); i++ ) {
-    assert( my_it != actions.end() );
-    assert( *i == *my_it );
+    /* a malicious peer can send a non-prefix state; drop it instead of aborting */
+    dos_assert( my_it != actions.end() );
+    dos_assert( *i == *my_it );
     my_it++;
   }
 

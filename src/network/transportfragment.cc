@@ -103,7 +103,7 @@ bool FragmentAssembly::add_fragment( Fragment& frag )
     /* see if we already have this fragment */
     if ( ( fragments.size() > frag.fragment_num ) && ( fragments.at( frag.fragment_num ).initialized ) ) {
       /* make sure new version is same as what we already have */
-      assert( fragments.at( frag.fragment_num ) == frag );
+      dos_assert( fragments.at( frag.fragment_num ) == frag );
     } else {
       if ( (int)fragments.size() < frag.fragment_num + 1 ) {
         fragments.resize( frag.fragment_num + 1 );
@@ -115,12 +115,12 @@ bool FragmentAssembly::add_fragment( Fragment& frag )
 
   if ( frag.final ) {
     fragments_total = frag.fragment_num + 1;
-    assert( (int)fragments.size() <= fragments_total );
+    dos_assert( (int)fragments.size() <= fragments_total );
     fragments.resize( fragments_total );
   }
 
   if ( fragments_total != -1 ) {
-    assert( fragments_arrived <= fragments_total );
+    dos_assert( fragments_arrived <= fragments_total );
   }
 
   /* see if we're done */
@@ -134,7 +134,7 @@ Instruction FragmentAssembly::get_assembly( void )
   std::string encoded;
 
   for ( int i = 0; i < fragments_total; i++ ) {
-    assert( fragments.at( i ).initialized );
+    dos_assert( fragments.at( i ).initialized );
     encoded += fragments.at( i ).contents;
   }
 
