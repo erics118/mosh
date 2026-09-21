@@ -46,6 +46,7 @@ public:
   Renditions current_rendition;
   Hyperlink current_hyperlink;
   bool cursor_visible;
+  int cursor_style;
 
   const Framebuffer& last_frame;
 
