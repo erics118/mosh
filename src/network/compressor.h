@@ -34,6 +34,7 @@
 #define COMPRESSOR_H
 
 #include <string>
+#include <zlib.h>
 
 namespace Network {
 class Compressor
@@ -42,10 +43,13 @@ private:
   static const int BUFFER_SIZE = 2048 * 2048; /* effective limit on terminal size */
 
   unsigned char buffer[BUFFER_SIZE];
+  /* streams are inited once and reset per call, not rebuilt per datagram */
+  z_stream deflate_stream;
+  z_stream inflate_stream;
 
 public:
-  Compressor() : buffer() {}
-  ~Compressor() {}
+  Compressor();
+  ~Compressor();
 
   std::string compress_str( const std::string& input );
   std::string uncompress_str( const std::string& input );

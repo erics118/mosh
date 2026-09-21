@@ -176,20 +176,15 @@ std::vector<Fragment> Fragmenter::make_fragments( const Instruction& inst, size_
   uint16_t fragment_num = 0;
   std::vector<Fragment> ret;
 
-  while ( !payload.empty() ) {
-    std::string this_fragment;
-    bool final = false;
-
-    if ( payload.size() > MTU ) {
-      this_fragment = std::string( payload.begin(), payload.begin() + MTU );
-      payload = std::string( payload.begin() + MTU, payload.end() );
-    } else {
-      this_fragment = payload;
-      payload.clear();
-      final = true;
+  size_t offset = 0;
+  while ( offset < payload.size() ) {
+    size_t len = payload.size() - offset;
+    if ( len > MTU ) {
+      len = MTU;
     }
-
-    ret.push_back( Fragment( next_instruction_id, fragment_num++, final, this_fragment ) );
+    offset += len;
+    ret.push_back(
+      Fragment( next_instruction_id, fragment_num++, offset == payload.size(), payload.substr( offset - len, len ) ) );
   }
 
   return ret;

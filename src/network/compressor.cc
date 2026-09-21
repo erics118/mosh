@@ -37,20 +37,46 @@
 
 using namespace Network;
 
+Compressor::Compressor() : buffer(), deflate_stream(), inflate_stream()
+{
+  deflate_stream.zalloc = Z_NULL;
+  deflate_stream.zfree = Z_NULL;
+  deflate_stream.opaque = Z_NULL;
+  /* default level/windowBits match zlib's compress(), so output stays wire-compatible */
+  dos_assert( deflateInit( &deflate_stream, Z_DEFAULT_COMPRESSION ) == Z_OK );
+
+  inflate_stream.zalloc = Z_NULL;
+  inflate_stream.zfree = Z_NULL;
+  inflate_stream.opaque = Z_NULL;
+  dos_assert( inflateInit( &inflate_stream ) == Z_OK );
+}
+
+Compressor::~Compressor()
+{
+  deflateEnd( &deflate_stream );
+  inflateEnd( &inflate_stream );
+}
+
 std::string Compressor::compress_str( const std::string& input )
 {
-  long unsigned int len = BUFFER_SIZE;
-  dos_assert( Z_OK
-              == compress( buffer, &len, reinterpret_cast<const unsigned char*>( input.data() ), input.size() ) );
-  return std::string( reinterpret_cast<char*>( buffer ), len );
+  dos_assert( deflateReset( &deflate_stream ) == Z_OK );
+  deflate_stream.next_in = reinterpret_cast<Bytef*>( const_cast<char*>( input.data() ) );
+  deflate_stream.avail_in = input.size();
+  deflate_stream.next_out = buffer;
+  deflate_stream.avail_out = BUFFER_SIZE;
+  dos_assert( deflate( &deflate_stream, Z_FINISH ) == Z_STREAM_END );
+  return std::string( reinterpret_cast<char*>( buffer ), BUFFER_SIZE - deflate_stream.avail_out );
 }
 
 std::string Compressor::uncompress_str( const std::string& input )
 {
-  long unsigned int len = BUFFER_SIZE;
-  dos_assert( Z_OK
-              == uncompress( buffer, &len, reinterpret_cast<const unsigned char*>( input.data() ), input.size() ) );
-  return std::string( reinterpret_cast<char*>( buffer ), len );
+  dos_assert( inflateReset( &inflate_stream ) == Z_OK );
+  inflate_stream.next_in = reinterpret_cast<Bytef*>( const_cast<char*>( input.data() ) );
+  inflate_stream.avail_in = input.size();
+  inflate_stream.next_out = buffer;
+  inflate_stream.avail_out = BUFFER_SIZE;
+  dos_assert( inflate( &inflate_stream, Z_FINISH ) == Z_STREAM_END );
+  return std::string( reinterpret_cast<char*>( buffer ), BUFFER_SIZE - inflate_stream.avail_out );
 }
 
 /* construct on first use */
