@@ -212,7 +212,13 @@ int main( int argc, char* argv[] )
     success = false;
   }
 
-  printf( "[mosh is exiting.]\n" );
+  /* name the host when mosh.pl passes it */
+  const char* host = getenv( "MOSH_HOST" );
+  if ( host != NULL && host[0] != '\0' ) {
+    printf( "Mosh connection to %s closed.\n", host );
+  } else {
+    printf( "Mosh connection closed.\n" );
+  }
 
   return !success;
 }

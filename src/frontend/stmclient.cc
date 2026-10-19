@@ -359,7 +359,7 @@ bool STMClient::process_user_input( int fd )
           exit( 1 );
         }
 
-        fputs( "\n\033[37;44m[mosh is suspended.]\033[m\n", stdout );
+        fputs( "\n\033[37;44mMosh suspended.\033[m\n", stdout );
 
         fflush( NULL );
 

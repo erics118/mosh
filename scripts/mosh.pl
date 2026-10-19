@@ -328,6 +328,8 @@ if ( (not defined $colors)
 }
 
 $ENV{ 'MOSH_CLIENT_PID' } = $$; # We don't support this, but it's useful for test and debug.
+# the host as typed, without any user@, for the client's closing message
+$ENV{ 'MOSH_HOST' } = ( $userhost =~ /([^@]*)$/ )[0] if defined $userhost;
 
 # If we are using a locally-resolved address, we have to get it before we fork,
 # so both parent and child get it.
@@ -444,7 +446,6 @@ if ( $pid == 0 ) { # child
 
   if ( not defined $ip ) {
     if ( defined $sship ) {
-      warn "$0: Using remote IP address ${sship} from \$SSH_CONNECTION for hostname ${userhost}\n";
       $ip = $sship;
     } else {
       die "$0: Did not find remote IP address (is SSH ProxyCommand disabled?).\n";
